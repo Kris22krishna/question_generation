@@ -58,14 +58,23 @@ class PythonSandbox:
         # Add RestrictedPython guards
         builtins['_iter_unpack_sequence_'] = guarded_iter_unpack_sequence
         builtins['_unpack_sequence_'] = guarded_unpack_sequence
+        builtins['_getattr_'] = getattr
+        builtins['_getitem_'] = lambda obj, key: obj[key]
         
+        def safe_import(name, globals=None, locals=None, fromlist=(), level=0):
+            if name in ['random', 'math']:
+                return __import__(name, globals, locals, fromlist, level)
+            raise ImportError(f"Import of {name} is not allowed")
+            
+        builtins['__import__'] = safe_import
+
         # Block dangerous functions
-        builtins['__import__'] = None
+        # builtins['__import__'] = None # Replaced by safe_import
         builtins['open'] = None
         builtins['eval'] = None
         builtins['exec'] = None
         builtins['compile'] = None
-        builtins['__builtins__'] = None
+        builtins['__builtins__'] = builtins
         
         return builtins
     
@@ -93,12 +102,6 @@ class PythonSandbox:
                 mode='exec'
             )
             
-            # Check for compilation errors
-            if byte_code.errors:
-                result['error'] = '\n'.join(byte_code.errors)
-                result['error_type'] = 'SyntaxError'
-                return result
-            
             # Set up execution environment
             exec_globals = self.safe_builtins.copy()
             exec_locals = {}
@@ -118,7 +121,7 @@ class PythonSandbox:
             
             try:
                 # Execute the code
-                exec(byte_code.code, exec_globals, exec_locals)
+                exec(byte_code, exec_globals, exec_locals)
                 
                 # Look for return value in locals
                 # Check for common return patterns
@@ -138,6 +141,10 @@ class PythonSandbox:
                 if has_alarm:
                     signal.alarm(0)
         
+        except SyntaxError as e:
+            result['error'] = f"Syntax Error: {e}"
+            result['error_type'] = 'SyntaxError'
+
         except TimeoutException:
             result['error'] = f"Code execution exceeded {self.timeout} second timeout"
             result['error_type'] = 'TimeoutError'

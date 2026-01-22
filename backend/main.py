@@ -11,9 +11,17 @@ app = FastAPI(
 )
 
 # Configure CORS
+# Configure CORS
+origins = settings.cors_origins
+# Debugging: Ensure localhost:5500 is included
+if "http://localhost:5500" not in origins:
+    origins.append("http://localhost:5500")
+
+print(f"DEBUG: Loaded CORS origins: {origins}")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
