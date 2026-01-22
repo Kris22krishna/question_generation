@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Template - Question Template Builder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- CodeMirror CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/material-darker.min.css">
+
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">Question Template Builder</div>
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar"></div>
+                <span id="userName"></span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="flex-between mb-lg">
+            <div>
+                <h1>Create Question Template</h1>
+                <p style="color: var(--text-muted);">Define a new dynamic question template</p>
+            </div>
+            <a href="skills.html" class="btn btn-secondary">
+                ← Back to Skills
+            </a>
+        </div>
+
+        <!-- Template Form -->
+        <form id="templateForm">
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--spacing-md);">
+                <!-- Grade -->
+                <div class="form-group">
+                    <label for="grade" class="form-label">Grade</label>
+                    <select id="grade" class="form-select" required>
+                        <option value="">-- Select Grade --</option>
+                        <option value="1">Grade 1</option>
+                        <option value="2">Grade 2</option>
+                        <option value="3">Grade 3</option>
+                        <option value="4">Grade 4</option>
+                        <option value="5">Grade 5</option>
+                        <option value="6">Grade 6</option>
+                        <option value="7">Grade 7</option>
+                        <option value="8">Grade 8</option>
+                        <option value="9">Grade 9</option>
+                        <option value="10">Grade 10</option>
+                    </select>
+                </div>
+
+                <!-- Type -->
+                <div class="form-group">
+                    <label for="type" class="form-label">Question Type</label>
+                    <select id="type" class="form-select" required>
+                        <option value="">-- Select Type --</option>
+                        <option value="MCQ">MCQ (Multiple Choice Question)</option>
+                        <option value="MAQ">MAQ (Multiple Answer Question)</option>
+                        <option value="Numerical Input">Numerical Input</option>
+                        <option value="Text Input">Text Input</option>
+                        <option value="True-or-False">True-or-False</option>
+                    </select>
+                </div>
+            </div>
+
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--spacing-md);">
+                <!-- Topic -->
+                <div class="form-group">
+                    <label for="topic" class="form-label">Topic</label>
+                    <div class="autocomplete-wrapper">
+                        <input type="text" id="topic" class="form-input" placeholder="Enter or search topic..."
+                            autocomplete="off" required>
+                        <div id="topicSuggestions" class="autocomplete-suggestions hidden"></div>
+                    </div>
+                </div>
+
+                <!-- Skill Name -->
+                <div class="form-group">
+                    <label for="skillName" class="form-label">Skill Name</label>
+                    <div class="autocomplete-wrapper">
+                        <input type="text" id="skillName" class="form-input" placeholder="Enter or search skill..."
+                            autocomplete="off" required>
+                        <div id="skillSuggestions" class="autocomplete-suggestions hidden"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--spacing-md);">
+                <!-- Format (Auto-populated) -->
+                <div class="form-group">
+                    <label for="format" class="form-label">Format (Auto-calculated)</label>
+                    <input type="number" id="format" class="form-input" readonly placeholder="Will auto-populate...">
+                </div>
+
+                <!-- Created By (Read-only) -->
+                <div class="form-group">
+                    <label for="createdBy" class="form-label">Created By</label>
+                    <input type="text" id="createdBy" class="form-input" readonly>
+                </div>
+            </div>
+
+            <!-- Question Template Code Editor -->
+            <div class="form-group code-editor-wrapper">
+                <label for="questionTemplate" class="form-label">Question Template (Python Code)</label>
+                <p style="color: var(--text-muted); font-size: var(--font-size-sm); margin-bottom: var(--spacing-sm);">
+                    Write Python code that generates a question. Store the result in a variable named 'question' or
+                    'result'.
+                </p>
+                <textarea id="questionTemplate" required></textarea>
+            </div>
+
+            <!-- Answer Template Code Editor -->
+            <div class="form-group code-editor-wrapper">
+                <label for="answerTemplate" class="form-label">Answer Template (Python Code)</label>
+                <p style="color: var(--text-muted); font-size: var(--font-size-sm); margin-bottom: var(--spacing-sm);">
+                    Write Python code that generates the answer. Store the result in a variable named 'answer' or
+                    'result'.
+                </p>
+                <textarea id="answerTemplate" required></textarea>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-md mt-lg">
+                <button type="button" id="previewBtn" class="btn btn-secondary">
+                    👁 Preview
+                </button>
+                <button type="submit" id="saveBtn" class="btn btn-success">
+                    💾 Save Template
+                </button>
+            </div>
+        </form>
+
+        <!-- Preview Section -->
+        <div id="previewSection" class="preview-section hidden">
+            <div class="preview-header">
+                <h2>Preview</h2>
+                <button type="button" id="closePreview" class="btn btn-secondary">Close</button>
+            </div>
+
+            <div id="previewContent" class="preview-content">
+                <div class="preview-question">
+                    <div class="preview-label">Question:</div>
+                    <div id="previewQuestionValue" class="preview-value">-</div>
+                </div>
+
+                <div class="preview-answer">
+                    <div class="preview-label">Answer:</div>
+                    <div id="previewAnswerValue" class="preview-value">-</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CodeMirror JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+
+    <script src="js/app.js"></script>
+    <script src="js/template.js"></script>
+</body>
+
+</html>
